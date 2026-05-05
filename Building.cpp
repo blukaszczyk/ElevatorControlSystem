@@ -1,60 +1,45 @@
 #include "Building.h"
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
-Building::Building(int numElevators) {
-    for (int i = 0; i < numElevators; ++i) {
-        elevators.push_back(Elevator(i + 1));
-    }
-    cout << "Building created with " << numElevators << " elevators\n";
+Building::Building() : elevator(1), currentUserFloor(0) {
+    cout << "   ELEVATOR CONTROL SYSTEM READY       \n";
+    cout << "You are on floor " << currentUserFloor << "\n";
+    cout << "Elevator is on floor " << elevator.getCurrentFloor() << "\n";
 }
 
 Building::~Building() {
     cout << "Building destroyed.\n";
 }
 
-void Building::addRequest(const Request& req) {
-    pendingRequests.push_back(req);
-    cout << "New request: Floor " << req.getPickupFloor() 
-         << " -> Floor " << req.getDestinationFloor() << "\n";
+void Building::callElevator() {
+    cout << "\n ELEVATOR COMING TO FLOOR " << currentUserFloor << " \n";
+    
+    if (elevator.getCurrentFloor() == currentUserFloor) {
+        cout << "Elevator is already here!\n";
+        return;
+    }
+    
+    elevator.addRequest(Request(currentUserFloor, currentUserFloor));
+    elevator.processNextRequest();
+    cout << "\n ELEVATOR IS HERE! \n";
 }
 
-void Building::assignRequests() {
-    for (auto& req : pendingRequests) {
-        // Find idle elevator
-        auto it = find_if(elevators.begin(), elevators.end(), 
-                               [](const Elevator& e) { return e.idle(); });
-        if (it != elevators.end()) {
-            cout << "Assigning to idle Elevator " << it->getId() << "\n";
-            it->addRequest(req);
-        } else {
-            // Assign to elevator with fewest requests
-            auto best = min_element(elevators.begin(), elevators.end(),
-                         [](const Elevator& a, const Elevator& b) {
-                             return a.idle() < b.idle();
-                         });
-            cout << "All elevators busy, assigning to Elevator " << best->getId() << "\n";
-            best->addRequest(req);
-        }
-    }
-    pendingRequests.clear();
+void Building::goToFloor(int destination) {
+    cout << "\n GOING TO FLOOR " << destination << " \n";
+    
+    elevator.addRequest(Request(currentUserFloor, destination));
+    elevator.processNextRequest();
+    currentUserFloor = destination;
+    cout << "\n ARRIVED AT FLOOR " << currentUserFloor << " \n";
 }
 
-void Building::simulateStep() {
-    assignRequests();
-    for (auto& e : elevators) {
-        if (!e.idle()) {
-            e.processNextRequest();
-        }
-    }
+void Building::displayStatus() const {
+    cout << "You are on floor: " << currentUserFloor << "\n";
+    cout << "Elevator on floor: " << elevator.getCurrentFloor() << "\n";
 }
 
-void Building::displayAllElevators() const {
-    cout << "\n=== Building Status ===\n";
-    for (const auto& e : elevators) {
-        e.displayStatus();
-    }
-    cout << "======================\n\n";
+Elevator& Building::getElevator() {
+    return elevator;
 }

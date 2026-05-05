@@ -4,19 +4,21 @@
 #include <vector>
 #include "Elevator.h"
 
+using namespace std;
+
 class Building {
 private:
-    vector<Elevator> elevators;
-    vector<Request> pendingRequests;
+    Elevator elevator;
+    int currentUserFloor;
 
 public:
-    Building(int numElevators);
+    Building();
     ~Building();
 
-    void addRequest(const Request& req);
-    void assignRequests();
-    void simulateStep();
-    void displayAllElevators() const;
+    void callElevator();
+    void goToFloor(int destination);
+    void displayStatus() const;
+    Elevator& getElevator();
 };
 
 #endif

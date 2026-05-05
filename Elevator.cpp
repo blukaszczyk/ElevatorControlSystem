@@ -12,13 +12,13 @@ Elevator::~Elevator() {
 
 int Elevator::getId() const { return id; }
 int Elevator::getCurrentFloor() const { return currentFloor; }
+void Elevator::setCurrentFloor(int floor) { currentFloor = floor; }
 bool Elevator::isMovingUp() const { return movingUp; }
 bool Elevator::idle() const { return isIdle; }
 
 void Elevator::addRequest(const Request& req) {
     assignedRequests.push_back(req);
     isIdle = false;
-    cout << "Elevator " << id << " received request to floor " << req.getDestinationFloor() << "\n";
 }
 
 void Elevator::processNextRequest() {
@@ -31,8 +31,8 @@ void Elevator::processNextRequest() {
     assignedRequests.erase(assignedRequests.begin());
 
     // Go to pickup floor
-    cout << "Elevator " << id << " moving from floor " << currentFloor 
-         << " to pickup at floor " << next.getPickupFloor() << "\n";
+    cout << "Elevator moving from floor " << currentFloor 
+         << " to floor " << next.getPickupFloor() << "\n";
     while (currentFloor != next.getPickupFloor()) {
         if (currentFloor < next.getPickupFloor()) {
             currentFloor++;
@@ -43,31 +43,31 @@ void Elevator::processNextRequest() {
         }
         cout << "  -> Floor " << currentFloor << "\n";
     }
-    cout << "Elevator " << id << " picked up at floor " << currentFloor << "\n";
-
-    // Go to destination floor
-    cout << "Elevator " << id << " moving from floor " << currentFloor 
-         << " to destination floor " << next.getDestinationFloor() << "\n";
-    while (currentFloor != next.getDestinationFloor()) {
-        if (currentFloor < next.getDestinationFloor()) {
-            currentFloor++;
-            movingUp = true;
-        } else {
-            currentFloor--;
-            movingUp = false;
+    
+    if (next.getPickupFloor() == next.getDestinationFloor()) {
+        cout << "Elevator arrived at floor " << currentFloor << " (waiting for destination)\n";
+    } else {
+        cout << "Elevator arrived at floor " << currentFloor << "\n";
+        
+        // Continue to destination
+        cout << "Elevator moving from floor " << currentFloor 
+             << " to floor " << next.getDestinationFloor() << "\n";
+        while (currentFloor != next.getDestinationFloor()) {
+            if (currentFloor < next.getDestinationFloor()) {
+                currentFloor++;
+                movingUp = true;
+            } else {
+                currentFloor--;
+                movingUp = false;
+            }
+            cout << "  -> Floor " << currentFloor << "\n";
         }
-        cout << "  -> Floor " << currentFloor << "\n";
+        cout << "Elevator arrived at destination floor " << currentFloor << "\n";
     }
-    cout << "Elevator " << id << " dropped off at floor " << currentFloor << "\n";
-}
-
-void Elevator::moveOneStep() {
-    // This method is kept for compatibility
 }
 
 void Elevator::displayStatus() const {
-    cout << "Elevator " << id << " | Floor: " << currentFloor 
+    cout << "Elevator " << id << " | Current Floor: " << currentFloor 
          << " | Direction: " << (movingUp ? "UP" : "DOWN") 
-         << " | Pending requests: " << assignedRequests.size()
          << " | Status: " << (isIdle ? "IDLE" : "BUSY") << "\n";
 }
