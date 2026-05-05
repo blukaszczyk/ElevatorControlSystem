@@ -3,22 +3,25 @@
 
 #include <vector>
 #include "Elevator.h"
+#include "Request.h"
 
 using namespace std;
 
 class Building {
 private:
-    Elevator elevator;
-    int currentUserFloor;
+    vector<Elevator> elevators;
+    vector<Request> pendingRequests;
 
 public:
-    Building();
+    Building(int numElevators);
     ~Building();
 
-    void callElevator();
-    void goToFloor(int destination);
-    void displayStatus() const;
-    Elevator& getElevator();
+    void addRequest(const Request& req);
+    void dispatchRequests();     
+    void simulateAll();          
+    void displayAllElevators() const;
+    
+    int getElevatorCount() const { return elevators.size(); }
 };
 
 #endif

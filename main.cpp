@@ -1,17 +1,20 @@
 #include <iostream>
 #include <limits>
 #include "Building.h"
+#include "ControlPanel.h"
 
 using namespace std;
 
-void displayMenu(bool elevatorCalled) {
-    cout << "         ELEVATOR CONTROL SYSTEM        \n";
-    cout << "1. Call elevator to my floor\n";
-    if (elevatorCalled) {
-        cout << "2. Go to destination\n";
-    }
-    cout << "3. Show status\n";
+void displayMenu() {
+    cout << "\n========================================\n";
+    cout << "     ELEVATOR CONTROL SYSTEM           \n";
+    cout << "========================================\n";
+    cout << "1. Add task (pickup -> destination)\n";
+    cout << "2. Show all pending tasks\n";
+    cout << "3. RUN SIMULATION (elevators start doing tasks)\n";
+    cout << "4. Clear all tasks\n";
     cout << "0. Exit\n";
+    cout << "========================================\n";
     cout << "Your choice: ";
 }
 
@@ -30,51 +33,71 @@ int getValidIntInput() {
 }
 
 int main() {
-    Building building;
-    bool elevatorCalled = false;
+    cout << "========================================\n";
+    cout << "   WELCOME TO ELEVATOR CONTROL SYSTEM   \n";
+    cout << "========================================\n";
+    
+    ControlPanel panel;
+    Building building(2);  // 2 elevators starting on random floors
     
     int choice;
     do {
-        displayMenu(elevatorCalled);
+        displayMenu();
         choice = getValidIntInput();
-        
-        if (!elevatorCalled && choice == 2) {
-            cout << "\n Unavailable \n";
-            continue;
-        }
         
         switch(choice) {
             case 1: {
-                building.callElevator();
-                elevatorCalled = true;
+                int pickup, destination;
+                cout << "Pickup floor (0-10): ";
+                pickup = getValidIntInput();
+                cout << "Destination floor (0-10): ";
+                destination = getValidIntInput();
+                panel.addTask(pickup, destination);
                 break;
             }
             
             case 2: {
-                int destination;
-                cout << "Which floor? (0-10): ";
-                destination = getValidIntInput();
-                
-                if (destination < 0 || destination > 10) {
-                    cout << "Invalid floor! Use 0-10.\n";
-                } else {
-                    building.goToFloor(destination);
-                    elevatorCalled = false;
-                }
+                panel.displayAllTasks();
+                building.displayAllElevators();
                 break;
             }
             
             case 3: {
-                building.displayStatus();
+                if (panel.getTaskCount() == 0) {
+                    cout << "\n*** NO TASKS TO RUN! Add tasks first. ***\n";
+                } else {
+                    cout << "\n=== RUNNING SIMULATION WITH " << panel.getTaskCount() << " TASKS ===\n";
+                    
+                    // Add all tasks to building
+                    vector<Request> tasks = panel.getAllTasks();
+                    for (const auto& task : tasks) {
+                        building.addRequest(task);
+                    }
+                    
+                    // Run simulation
+                    building.simulateAll();
+                    
+                    // Show final elevator positions
+                    building.displayAllElevators();
+                    
+                    // Clear tasks from panel after simulation
+                    panel.clearTasks();
+                }
+                break;
+            }
+            
+            case 4: {
+                panel.clearTasks();
                 break;
             }
             
             case 0: {
+                cout << "\nGoodbye!\n";
                 break;
             }
             
             default: {
-                cout << "Invalid choice!\n";
+                cout << "Invalid choice! Enter 0-4.\n";
                 break;
             }
         }

@@ -11,21 +11,21 @@ private:
     int id;
     int currentFloor;
     bool movingUp;
-    bool isIdle;
+    bool isBusy;
     vector<Request> assignedRequests;
 
 public:
-    Elevator(int id);
+    Elevator(int id, int startFloor);
     ~Elevator();
 
     int getId() const;
     int getCurrentFloor() const;
-    void setCurrentFloor(int floor);
     bool isMovingUp() const;
-    bool idle() const;
+    bool busy() const;
 
     void addRequest(const Request& req);
     void processNextRequest();
+    int calculateDistance(int floor) const;
     void displayStatus() const;
 };
 
