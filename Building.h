@@ -6,8 +6,8 @@
 
 class Building {
 private:
-    std::vector<Elevator> elevators;
-    std::vector<Request> pendingRequests;
+    vector<Elevator> elevators;
+    vector<Request> pendingRequests;
 
 public:
     Building(int numElevators);

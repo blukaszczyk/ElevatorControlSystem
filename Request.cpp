@@ -1,5 +1,7 @@
 #include "Request.h"
 
+using namespace std;
+
 Request::Request(int pickup, int destination) 
     : pickupFloor(pickup), destinationFloor(destination) {}
 
